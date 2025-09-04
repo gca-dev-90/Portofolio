@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 type Skill = {
   name: string;
@@ -58,7 +58,9 @@ export default function FloatingSkills({
   persistKey?: string;
 }) {
   // Generate on client only to avoid SSR/client hydration mismatch
-  const [items, setItems] = useState<Array<{ icon: Skill; style: CSSVars }>>([]);
+  const [items, setItems] = useState<Array<{ icon: Skill; style: CSSVars; tipAbove: boolean }>>([]);
+  const [focused, setFocused] = useState<number | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Resolve a deterministic seed
   const resolvedSeed = useMemo(() => {
@@ -76,7 +78,91 @@ export default function FloatingSkills({
 
   useEffect(() => {
     const rand = makeSeededRand(resolvedSeed);
+    // Pick effective size range based on viewport (smaller on small screens)
+    let min = sizeMin;
+    let max = sizeMax;
+    if (typeof window !== 'undefined') {
+      const w = window.innerWidth;
+      if (w < 480) {
+        min = Math.min(sizeMin, 44);
+        max = Math.min(sizeMax, 72);
+      } else if (w < 768) {
+        min = Math.min(sizeMin, 56);
+        max = Math.min(sizeMax, 88);
+      }
+    }
 
+    // Mirror layout: 5 icons left, 5 right (reflected). Do this early and return.
+    const leftGroup = ['GitHub', 'HTML5', 'Node.js', 'CSS3', 'SQLite'];
+    const mirrorMap: Record<string, string> = {
+      'GitHub': 'JavaScript',
+      'HTML5': 'TailwindCSS',
+      'Node.js': 'PHP',
+      'CSS3': 'VS Code',
+      'SQLite': 'MySQL',
+    };
+
+    type P = { left: number; top: number; size: number; dx: number; dy: number; duration: string; delay: string; bobDur: string; bobDelay: string };
+    const base: Record<string, P> = {};
+    const placedPts: Array<{ left: number; top: number }> = [];
+    const minDistPct = 18; // percent units
+    const center = { x: 50, y: 45, r: 24 };
+    const outsideHero = (x: number, y: number) => Math.hypot(x - center.x, y - center.y) > center.r;
+    const farEnough = (x: number, y: number) => placedPts.every(p => Math.hypot(p.left - x, p.top - y) >= minDistPct);
+
+    function sampleLeft(): { left: number; top: number } {
+      let L = 0, T = 0, tries = 0;
+      do {
+        L = rand(10, 40);
+        T = rand(16, 84);
+        tries++;
+      } while (!(outsideHero(L, T) && farEnough(L, T)) && tries < 150);
+      return { left: L, top: T };
+    }
+
+    // Create left base positions
+    for (const name of leftGroup) {
+      const size = Math.round(rand(min, max));
+      const { left, top } = sampleLeft();
+      const dx = Math.round(rand(-50, 50));
+      const dy = Math.round(rand(-50, 50));
+      const duration = rand(14, 30).toFixed(1);
+      const delay = (-1 * rand(0, 20)).toFixed(1);
+      const bobDur = rand(2.6, 4.2).toFixed(2);
+      const bobDelay = (-1 * rand(0, 2)).toFixed(2);
+      base[name] = { left, top, size, dx, dy, duration, delay, bobDur, bobDelay };
+      placedPts.push({ left, top });
+    }
+
+    // Mirror to right group
+    Object.entries(mirrorMap).forEach(([L, R]) => {
+      const b = base[L];
+      if (!b) return;
+      base[R] = { left: 100 - b.left, top: b.top, size: b.size, dx: -b.dx, dy: b.dy, duration: b.duration, delay: b.delay, bobDur: b.bobDur, bobDelay: b.bobDelay };
+    });
+
+    const mirroredItems: Array<{ icon: Skill; style: CSSVars; tipAbove: boolean }> = SKILLS.map(icon => {
+      const p = base[icon.name];
+      const L = p?.left ?? 12;
+      const T = p?.top ?? 20 + Math.random() * 60;
+      const size = p?.size ?? Math.round(rand(min, max));
+      const style: CSSVars = {
+        width: `${size}px`,
+        height: `${size}px`,
+        left: `${L.toFixed(2)}%`,
+        top: `${T.toFixed(2)}%`,
+        '--dx': `${(p?.dx ?? 0)}px`,
+        '--dy': `${(p?.dy ?? 0)}px`,
+        '--duration': `${p?.duration ?? '20'}s`,
+        '--delay': `${p?.delay ?? '0'}s`,
+        '--bob-duration': `${p?.bobDur ?? '3.5'}s`,
+        '--bob-delay': `${p?.bobDelay ?? '0'}s`,
+      };
+      const tipAbove = T > 78;
+      return { icon, style, tipAbove };
+    });
+    setItems(mirroredItems);
+    return;
     // Sample a position in lanes around the hero to prevent overlap
     type Lane = 'left' | 'right' | 'top' | 'bottom';
     const sampleLane = (lane: Lane) => {
@@ -121,12 +207,12 @@ export default function FloatingSkills({
       }
     };
 
-    const generated: Array<{ icon: Skill; style: CSSVars }> = [];
+    const generated: Array<{ icon: Skill; style: CSSVars; tipAbove: boolean }> = [];
     const placed: Array<{ left: number; top: number }> = [];
-    const minDist = 12; // minimum distance between icons in viewport percent
+    const minDist = 18; // minimum distance between icons in viewport percent (more separation)
 
     SKILLS.forEach((icon, i) => {
-      const size = Math.round(rand(sizeMin, sizeMax));
+      const size = Math.round(rand(min, max));
       const laneOrder: Lane[] = ['left', 'right', 'top', 'bottom'];
       let lane = laneOrder[i % laneOrder.length];
       if (icon.name === 'MySQL') lane = 'right';
@@ -152,7 +238,7 @@ export default function FloatingSkills({
       const farEnough = (x: number, y: number) =>
         placed.every(p => Math.hypot(p.left - x, p.top - y) >= minDist);
       let attempts = 0;
-      while (!farEnough(s.left, s.top) && attempts < 50) {
+      while (!farEnough(s.left, s.top) && attempts < 100) {
         s = sampleLane(lane);
         if (icon.name === 'MySQL') {
           s.left = Math.max(s.left, 78);
@@ -189,23 +275,47 @@ export default function FloatingSkills({
         '--bob-duration': `${bobDur}s`,
         '--bob-delay': `${bobDelay}s`,
       };
-      generated.push({ icon, style });
+      const tipAbove = s.top > 78; // near bottom -> show tooltip above
+      generated.push({ icon, style, tipAbove });
     });
     setItems(generated);
   }, [sizeMin, sizeMax, resolvedSeed]);
 
+  // Dismiss with Escape key (outside click disabled for sticky focus)
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setFocused(null);
+    };
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, []);
+
   return (
-    <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-      {items.map(({ icon, style }, idx) => (
-        <img
+    <div ref={containerRef} className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+      {items.map(({ icon, style, tipAbove }, idx) => (
+        <div
           key={idx}
-          src={icon.icon}
-          alt={icon.name}
-          title={icon.name}
-          className={`float-skill pointer-events-auto select-none rounded-full bg-white p-1 ring-1 ring-black/10 shadow-sm hover:scale-110 cursor-pointer ${icon.className ?? ''}`}
+          className={`float-skill group pointer-events-auto cursor-pointer z-10 ${focused === idx ? 'focused' : ''}`}
           style={style}
-          draggable={false}
-        />
+          onClick={(e) => { e.stopPropagation(); setFocused(focused === idx ? null : idx); }}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setFocused(focused === idx ? null : idx); }}}
+          role="button"
+          tabIndex={0}
+          aria-pressed={focused === idx}
+        >
+          <img
+            src={icon.icon}
+            alt={icon.name}
+            className={`skill-img select-none rounded-full bg-white p-1 ring-1 ring-black/10 shadow-sm ${icon.className ?? ''}`}
+            draggable={false}
+          />
+          <span
+            className={`skill-tip ${tipAbove ? 'tip-above' : 'tip-below'} absolute left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg text-sm font-semibold text-black bg-white/90 dark:text-black dark:bg-white/90 ring-1 ring-black/10 shadow-lg backdrop-blur-sm transition-opacity duration-200 pointer-events-none z-10 ${focused === idx ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+            style={tipAbove ? { bottom: 'calc(100% + 12px)' } : { top: 'calc(100% + 12px)' }}
+          >
+            {icon.name}
+          </span>
+        </div>
       ))}
     </div>
   );

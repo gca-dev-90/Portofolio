@@ -4,9 +4,9 @@ const Hero: React.FC = () => (
   <section className="relative flex flex-col items-center justify-center text-center py-24 text-foreground overflow-hidden">
     <div className="relative z-10">
       {/* Avatar + equal-size halo */}
-      <div className="relative w-[260px] h-[260px] mb-6">
+      <div className="relative w-[260px] h-[260px] mb-6 mx-auto">
         <div
-          className="pointer-events-none absolute left-1/2 top-1/2 -z-10 -translate-x-1/2 -translate-y-1/2 w-[560px] h-[560px]"
+          className="pointer-events-none absolute left-1/2 top-1/2 -z-10 -translate-x-1/2 -translate-y-1/2 w-[420px] h-[420px] sm:w-[560px] sm:h-[560px]"
           style={{
             WebkitMaskImage: 'radial-gradient(circle at center, black 0%, black 55%, transparent 75%)',
             maskImage: 'radial-gradient(circle at center, black 0%, black 55%, transparent 75%)',
@@ -14,12 +14,14 @@ const Hero: React.FC = () => (
         >
           <div className="w-full h-full backdrop-brightness-110 backdrop-blur-sm" />
         </div>
+        {/* Orbiting glow that waves around the picture (final tight radius) */}
+        <div className="orbit-dot w-[260px] h-[260px] sm:w-[280px] sm:h-[280px] z-0" />
         <Image
           src="/WebPicture.png"
           alt="Web Picture"
           fill
           sizes="260px"
-          className="rounded-full object-cover shadow-xl"
+          className="rounded-full object-cover object-center shadow-xl z-10"
           priority
         />
       </div>

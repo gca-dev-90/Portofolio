@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import BackgroundWaves from '@/components/BackgroundWaves';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://yourdomain.com'),
@@ -32,9 +33,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="min-h-screen text-foreground font-sans bg-[conic-gradient(from_210deg_at_50%_50%,_#f8fafc_0deg,_#e5e7eb_28deg,_#cbd5e1_95deg,_#9ca3af_150deg,_#6b7280_210deg,_#52525b_265deg,_#a1a1aa_320deg,_#f8fafc_360deg)] bg-fixed">
+      <body className="min-h-screen text-foreground font-sans bg-gradient-to-br from-zinc-100 via-zinc-200 to-zinc-500">
         <Navbar />
-        <main className="min-h-screen pt-16 pb-16">{children}</main>
+        <main className="min-h-screen pt-16 pb-16 relative z-10">
+          {/* Waves that scroll with the page */}
+          <BackgroundWaves />
+          {children}
+        </main>
         <Footer />
       </body>
     </html>
