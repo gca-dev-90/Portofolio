@@ -46,7 +46,7 @@ function ContactForm() {
           setForm(initialState);
         } else {
           const data = await res.json().catch(() => ({}));
-          setErrors({ form: (data as any).error || 'Failed to send message.' });
+          setErrors({ form: (data as { error?: string }).error || 'Failed to send message.' });
         }
       } catch {
         setErrors({ form: 'Failed to send message.' });

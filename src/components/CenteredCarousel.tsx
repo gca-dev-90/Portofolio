@@ -94,7 +94,7 @@ export function CenteredCarousel({
 }) {
   const [index, setIndex] = useState(0);
   const trackRef = useRef<HTMLDivElement>(null);
-  const timerRef = useRef<any>(null);
+  const timerRef = useRef<number | null>(null);
 
   // Autoplay
   useEffect(() => {

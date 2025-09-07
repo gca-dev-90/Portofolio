@@ -38,7 +38,7 @@ function getSlidesToShow(slides: SlidesToShow | undefined): number {
   if (!slides) return 1;
   if (typeof window === 'undefined') return slides.base;
   const w = window.innerWidth;
-  for (let bp of breakpoints) {
+  for (const bp of breakpoints) {
     if (w >= bp.width && slides[bp.key]) return slides[bp.key]!;
   }
   return slides.base;
@@ -155,11 +155,18 @@ const Carousel = React.forwardRef<unknown, CarouselProps>(
     }));
     function onDragStart(e: React.PointerEvent) {
       setIsDragging(true);
-      setStartX(e.clientX || (e as any).touches?.[0]?.clientX);
+      setStartX(
+        'touches' in e
+          ? (e as unknown as TouchEvent).touches?.[0]?.clientX
+          : (e as MouseEvent).clientX
+      );
     }
     function onDragMove(e: React.PointerEvent) {
       if (!isDragging) return;
-      const x = e.clientX || (e as any).touches?.[0]?.clientX;
+      const x =
+        'touches' in e
+          ? (e as unknown as TouchEvent).touches?.[0]?.clientX
+          : (e as MouseEvent).clientX;
       setTranslate(x - startX);
     }
     function onDragEnd() {
