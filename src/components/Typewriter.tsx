@@ -29,7 +29,7 @@ export default function Typewriter({
 
   useEffect(() => {
   let intervalId: ReturnType<typeof window.setInterval> | undefined;
-  const timeoutId: ReturnType<typeof window.setTimeout> | undefined;
+  let timeoutId: ReturnType<typeof window.setTimeout> | undefined;
     if (!start) return;
     // reset if starting again
     if (iRef.current === 0) setOut("");
