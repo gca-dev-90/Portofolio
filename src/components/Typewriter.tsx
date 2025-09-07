@@ -29,7 +29,19 @@ export default function Typewriter({
 
   useEffect(() => {
     let intervalId: ReturnType<typeof window.setInterval> | undefined;
-    let timeoutId: ReturnType<typeof window.setTimeout> | undefined;
+    const timeoutId: ReturnType<typeof window.setTimeout> = window.setTimeout(() => {
+      intervalId = window.setInterval(() => {
+        iRef.current += 1;
+        setOut(text.slice(0, iRef.current));
+        if (iRef.current >= text.length) {
+          if (intervalId) window.clearInterval(intervalId);
+          if (!doneRef.current) {
+            doneRef.current = true;
+            onDone?.();
+          }
+        }
+      }, speed);
+    }, startDelay);
     if (!start) return;
     // reset if starting again
     if (iRef.current === 0) setOut("");
