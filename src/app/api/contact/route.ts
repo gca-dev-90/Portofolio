@@ -195,12 +195,12 @@ export async function POST(req: NextRequest) {
 
   const subject = `Portfolio Contact from ${safeName || 'Unknown'}`;
   const emailText = [
-  'New contact submission',
-  `Name: ${safeName}`,
-  `Email: ${safeEmail}`,
-  'Message:',
-  safeMessage,
-].join('\n');
+    'New contact submission',
+    `Name: ${safeName}`,
+    `Email: ${safeEmail}`,
+    'Message:',
+    safeMessage,
+  ].join('\n');
 
   // Log submission (best-effort)
   console.log(`[contact] ${new Date(now).toISOString()} ip=${ip} ua="${ua}" name="${safeName}"`);
