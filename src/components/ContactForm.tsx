@@ -73,14 +73,14 @@ function ContactForm() {
       </div>
 
       <div>
-        <label htmlFor="name" className="block mb-1 text-gray-700 dark:text-gray-300">Name</label>
+        <label htmlFor="name" className="block mb-1 text-black">Name</label>
         <input
           type="text"
           name="name"
           id="name"
           value={form.name}
           onChange={handleChange}
-          className="w-full px-4 py-2 rounded bg-white text-black border border-black focus:border-accent-blue focus:ring-2 focus:ring-accent-blue outline-none"
+          className="w-full px-4 py-2 rounded bg-white text-black border border-black hover:border-gray-400 focus:border-gray-400 focus:ring-2 focus:ring-gray-300 outline-none"
           aria-invalid={Boolean(errors.name)}
           aria-describedby={errors.name ? 'name-error' : undefined}
         />
@@ -88,14 +88,14 @@ function ContactForm() {
       </div>
 
       <div>
-        <label htmlFor="email" className="block mb-1 text-gray-700 dark:text-gray-300">Email</label>
+        <label htmlFor="email" className="block mb-1 text-black">Email</label>
         <input
           type="email"
           name="email"
           id="email"
           value={form.email}
           onChange={handleChange}
-          className="w-full px-4 py-2 rounded bg-white text-black border border-black focus:border-accent-blue focus:ring-2 focus:ring-accent-blue outline-none"
+          className="w-full px-4 py-2 rounded bg-white text-black border border-black hover:border-gray-400 focus:border-gray-400 focus:ring-2 focus:ring-gray-300 outline-none"
           aria-invalid={Boolean(errors.email)}
           aria-describedby={errors.email ? 'email-error' : undefined}
         />
@@ -103,14 +103,14 @@ function ContactForm() {
       </div>
 
       <div>
-        <label htmlFor="message" className="block mb-1 text-gray-700 dark:text-gray-300">Message</label>
+        <label htmlFor="message" className="block mb-1 text-black">Message</label>
         <textarea
           name="message"
           id="message"
           rows={5}
           value={form.message}
           onChange={handleChange}
-          className="w-full px-4 py-2 rounded bg-white text-black border border-black focus:border-accent-blue focus:ring-2 focus:ring-accent-blue outline-none"
+          className="w-full px-4 py-2 rounded bg-white text-black border border-black hover:border-gray-400 focus:border-gray-400 focus:ring-2 focus:ring-gray-300 outline-none"
           aria-invalid={Boolean(errors.message)}
           aria-describedby={errors.message ? 'message-error' : undefined}
         />
@@ -125,7 +125,7 @@ function ContactForm() {
         className={`block mx-auto py-2 px-5 rounded-full font-semibold text-base transition transform ${
           loading
             ? 'bg-gray-200 text-gray-500 cursor-wait'
-            : 'text-black ring-1 ring-sky-200 hover:bg-sky-100 hover:text-sky-500 hover:scale-105'
+            : 'text-black ring-1 ring-transparent hover:bg-gray-200 hover:text-gray-700 hover:scale-105 hover:shadow-[0_0_12px_rgba(75,85,99,0.55)] dark:hover:shadow-[0_0_12px_rgba(156,163,175,0.6)]'
         }`}
       >
         {loading ? 'Sending…' : 'Send Message'}

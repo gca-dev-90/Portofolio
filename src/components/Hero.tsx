@@ -1,3 +1,4 @@
+
 import Image from 'next/image';
 
 const Hero: React.FC = () => (
@@ -14,8 +15,8 @@ const Hero: React.FC = () => (
         >
           <div className="w-full h-full backdrop-brightness-110 backdrop-blur-sm" />
         </div>
-        {/* Orbiting glow that waves around the picture (final tight radius) */}
-        <div className="orbit-dot w-[260px] h-[260px] sm:w-[280px] sm:h-[280px] z-0" />
+  {/* Single fast orb */}
+  <div className="orbit-dot w-[260px] h-[260px] sm:w-[280px] sm:h-[280px] z-0" />
         <Image
           src="/WebPicture.png"
           alt="Web Picture"

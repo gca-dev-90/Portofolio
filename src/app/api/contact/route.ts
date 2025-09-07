@@ -194,13 +194,8 @@ export async function POST(req: NextRequest) {
   const safeMessage = sanitizePlainText(String(message), MAX_MESSAGE_CHARS);
 
   const subject = `Portfolio Contact from ${safeName || 'Unknown'}`;
-  const emailText = [
+  const emailText = 
     'New contact submission',
-    '',
-    `IP: ${ip}`,
-    `User-Agent: ${ua}`,
-    `Time: ${new Date(now).toISOString()}`,
-    '',
     `Name: ${safeName}`,
     `Email: ${safeEmail}`,
     'Message:',
