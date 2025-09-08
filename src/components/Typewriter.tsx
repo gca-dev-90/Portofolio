@@ -27,18 +27,19 @@ export default function Typewriter({
   const iRef = useRef(0);
   const doneRef = useRef(false);
 
+  const intervalRef = useRef<number | null>(null);
+
   useEffect(() => {
-    let intervalId: ReturnType<typeof window.setInterval> | undefined;
-    let timeoutId: ReturnType<typeof window.setTimeout> | undefined;
     if (!start) return;
     // reset if starting again
     if (iRef.current === 0) setOut("");
-    timeoutId = window.setTimeout(() => {
-      intervalId = window.setInterval(() => {
+
+    const timeoutId = window.setTimeout(() => {
+      intervalRef.current = window.setInterval(() => {
         iRef.current += 1;
         setOut(text.slice(0, iRef.current));
         if (iRef.current >= text.length) {
-          if (intervalId) window.clearInterval(intervalId);
+          if (intervalRef.current) window.clearInterval(intervalRef.current);
           if (!doneRef.current) {
             doneRef.current = true;
             onDone?.();
@@ -46,9 +47,10 @@ export default function Typewriter({
         }
       }, speed);
     }, startDelay);
+
     return () => {
-      if (timeoutId) window.clearTimeout(timeoutId);
-      if (intervalId) window.clearInterval(intervalId);
+      window.clearTimeout(timeoutId);
+      if (intervalRef.current) window.clearInterval(intervalRef.current);
     };
   }, [start, text, speed, startDelay, onDone]);
 

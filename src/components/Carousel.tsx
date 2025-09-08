@@ -69,6 +69,18 @@ const Carousel = React.forwardRef<unknown, CarouselProps>(
     const trackRef = useRef<HTMLDivElement>(null);
     const [isAutoPlay, setIsAutoPlay] = useState(autoPlay);
 
+    const handlePrev = useCallback(() => {
+      if (!infinite && currentIndex === 0) return;
+      setTransitioning(true);
+      setCurrentIndex((prev) => prev - 1);
+    }, [infinite, currentIndex]);
+
+    const handleNext = useCallback(() => {
+      if (!infinite && currentIndex >= items.length - slideCount) return;
+      setTransitioning(true);
+      setCurrentIndex((prev) => prev + 1);
+    }, [infinite, currentIndex, items.length, slideCount]);
+
     useEffect(() => {
       function handleResize() {
         setSlideCount(getSlidesToShow(slidesToShow));
@@ -88,6 +100,7 @@ const Carousel = React.forwardRef<unknown, CarouselProps>(
         return prev;
       });
     }, [slideCount, items.length, infinite]);
+
     useEffect(() => {
       if (!isAutoPlay) return;
       function play() {
@@ -97,7 +110,8 @@ const Carousel = React.forwardRef<unknown, CarouselProps>(
       }
       play();
       return () => { if (autoPlayRef.current) clearInterval(autoPlayRef.current); };
-    });
+    }, [isAutoPlay, autoPlayInterval, handleNext]);
+
     useEffect(() => {
       function onVisibility() {
         if (document.hidden && autoPlayRef.current) {
@@ -110,7 +124,8 @@ const Carousel = React.forwardRef<unknown, CarouselProps>(
       }
       document.addEventListener('visibilitychange', onVisibility);
       return () => { document.removeEventListener('visibilitychange', onVisibility); };
-    }, [isAutoPlay, autoPlayInterval]);
+    }, [isAutoPlay, autoPlayInterval, handleNext]);
+
     const fullItemList = infinite
       ? [
           ...items.slice(-slideCount),
@@ -119,6 +134,7 @@ const Carousel = React.forwardRef<unknown, CarouselProps>(
         ]
       : items;
     const totalSlides = fullItemList.length;
+
     const handleTransitionEnd = () => {
       setTransitioning(false);
       if (!infinite) return;
@@ -131,20 +147,12 @@ const Carousel = React.forwardRef<unknown, CarouselProps>(
         setCurrentIndex(index);
       }
     };
-    const handlePrev = useCallback(() => {
-      if (!infinite && currentIndex === 0) return;
-      setTransitioning(true);
-      setCurrentIndex((prev) => prev - 1);
-    }, [infinite, currentIndex]);
-    const handleNext = useCallback(() => {
-      if (!infinite && currentIndex >= items.length - slideCount) return;
-      setTransitioning(true);
-      setCurrentIndex((prev) => prev + 1);
-    }, [infinite, currentIndex, items.length, slideCount]);
+
     const goTo = (idx: number) => {
       setTransitioning(true);
       setCurrentIndex(infinite ? idx + slideCount : idx);
     };
+
     React.useImperativeHandle(ref, () => ({
       next: handleNext,
       prev: handlePrev,
@@ -153,12 +161,13 @@ const Carousel = React.forwardRef<unknown, CarouselProps>(
       play: () => setIsAutoPlay(true),
       current: currentIndex,
     }));
+
     function onDragStart(e: React.PointerEvent) {
       setIsDragging(true);
       setStartX(
         'touches' in e
           ? (e as unknown as TouchEvent).touches?.[0]?.clientX
-          : (e as MouseEvent).clientX
+          : (e as unknown as MouseEvent).clientX
       );
     }
     function onDragMove(e: React.PointerEvent) {
@@ -166,7 +175,7 @@ const Carousel = React.forwardRef<unknown, CarouselProps>(
       const x =
         'touches' in e
           ? (e as unknown as TouchEvent).touches?.[0]?.clientX
-          : (e as MouseEvent).clientX;
+          : (e as unknown as MouseEvent).clientX;
       setTranslate(x - startX);
     }
     function onDragEnd() {
@@ -184,6 +193,7 @@ const Carousel = React.forwardRef<unknown, CarouselProps>(
       if (e.key === 'ArrowLeft') handlePrev();
       if (e.key === 'ArrowRight') handleNext();
     }
+
     const slideWidth = 100 / slideCount;
     let realIndex = currentIndex;
     if (infinite) {
@@ -196,6 +206,7 @@ const Carousel = React.forwardRef<unknown, CarouselProps>(
       transition,
       willChange: 'transform',
     };
+
     return (
       <section
         role="region"
@@ -215,7 +226,7 @@ const Carousel = React.forwardRef<unknown, CarouselProps>(
               onClick={handlePrev}
               aria-label="Previous slide"
               disabled={!infinite && currentIndex === 0}
-              style={{left: 12}} // inner margin
+              style={{ left: 12 }}
             >
               <svg width="28" height="28" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 6l-6 8 6 8" stroke="#222" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </button>
@@ -224,7 +235,7 @@ const Carousel = React.forwardRef<unknown, CarouselProps>(
               onClick={handleNext}
               aria-label="Next slide"
               disabled={!infinite && currentIndex >= items.length - slideCount}
-              style={{right: 12}}
+              style={{ right: 12 }}
             >
               <svg width="28" height="28" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 6l6 8-6 8" stroke="#222" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </button>

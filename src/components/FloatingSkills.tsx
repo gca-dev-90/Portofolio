@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 type Skill = {
@@ -163,6 +164,7 @@ export default function FloatingSkills({
     });
     setItems(mirroredItems);
     return;
+
     // Sample a position in lanes around the hero to prevent overlap
     type Lane = 'left' | 'right' | 'top' | 'bottom';
     const sampleLane = (lane: Lane) => {

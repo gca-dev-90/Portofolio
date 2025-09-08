@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 import React, { useMemo, useRef, useEffect, useState } from "react";
 
 interface CarouselItem {
@@ -33,7 +34,7 @@ function ArrowButton({ direction = "left", onClick, disabled }: { direction: "le
       disabled={disabled}
       className={
         "absolute top-1/2 -translate-y-1/2 z-10 grid place-items-center h-10 w-10 rounded-full shadow-md bg-white/95 backdrop-blur " +
-  (isLeft ? "-left-14" : "-right-14") +
+        (isLeft ? "-left-14" : "-right-14") +
         (disabled ? " opacity-40 cursor-not-allowed" : " hover:bg-white")
       }
     >
@@ -46,7 +47,7 @@ function ArrowButton({ direction = "left", onClick, disabled }: { direction: "le
 
 function Card({ item }: { item: CarouselItem }) {
   return (
-  <article className="w-full h-full rounded-full shadow-md bg-white/[0.03] dark:bg-black/[0.03] backdrop-blur-xl border border-black ring-1 ring-white/10 px-8 py-10 flex flex-col justify-center items-center glass-card">
+    <article className="w-full h-full rounded-full shadow-md bg-white/[0.03] dark:bg-black/[0.03] backdrop-blur-xl border border-black ring-1 ring-white/10 px-8 py-10 flex flex-col justify-center items-center glass-card">
       {item.image && (
         <img
           alt={item.title || ""}
@@ -94,14 +95,16 @@ export function CenteredCarousel({
 }) {
   const [index, setIndex] = useState(0);
   const trackRef = useRef<HTMLDivElement>(null);
-  const timerRef = useRef<number | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Autoplay
   useEffect(() => {
     if (!autoPlay || items.length <= 1) return;
     const play = () => setIndex((i) => (infinite ? (i + 1) % items.length : Math.min(i + 1, items.length - 1)));
     timerRef.current = setInterval(play, autoPlayInterval);
-    return () => clearInterval(timerRef.current);
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
   }, [autoPlay, autoPlayInterval, infinite, items.length]);
 
   // Pause on hover
