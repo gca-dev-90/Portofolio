@@ -33,12 +33,13 @@ function ArrowButton({ direction = "left", onClick, disabled }: { direction: "le
       onClick={onClick}
       disabled={disabled}
       className={
-        "absolute top-1/2 -translate-y-1/2 z-10 grid place-items-center h-10 w-10 rounded-full shadow-md bg-white/95 backdrop-blur " +
-        (isLeft ? "-left-14" : "-right-14") +
+        // On mobile, arrows are inside; on desktop, further out
+        "absolute top-1/2 -translate-y-1/2 z-20 grid place-items-center w-11 h-11 rounded-full shadow-md bg-white/95 backdrop-blur border border-black/10 " +
+        (isLeft ? "left-2 sm:-left-14" : "right-2 sm:-right-14") +
         (disabled ? " opacity-40 cursor-not-allowed" : " hover:bg-white")
       }
     >
-      <span className="text-xl leading-none select-none">
+      <span className="text-2xl leading-none select-none">
         {isLeft ? "\u2039" : "\u203A"}
       </span>
     </button>
