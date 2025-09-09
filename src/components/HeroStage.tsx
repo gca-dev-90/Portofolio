@@ -14,9 +14,9 @@ export default function HeroStage({ children }: { children: ReactNode }) {
       className="hero-stage-wrap relative w-full"
       style={
         {
-          ["--stage-w" as any]: `${STAGE_W}px`,
-          ["--stage-h" as any]: `${STAGE_H}px`,
-        } as React.CSSProperties
+          ["--stage-w"]: `${STAGE_W}px`,
+          ["--stage-h"]: `${STAGE_H}px`,
+        } as React.CSSProperties & Record<string, string>
       }
     >
       {/* spacer reserves the scaled height so the absolute stage doesn't overlap next sections */}
