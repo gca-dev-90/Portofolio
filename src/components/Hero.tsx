@@ -56,10 +56,18 @@ const Hero: React.FC = () => {
             <div
               className="relative mb-6 flex items-center justify-center"
               style={{
-                width: `${AVATAR_SIZE}px`,
-                height: `${AVATAR_SIZE}px`,
+                width: "180px",
+                height: "180px",
               }}
             >
+              <Image
+                src="/WebPicture.png"
+                alt="Web Picture"
+                width={180}
+                height={180}
+                className="rounded-full object-cover object-center shadow-xl z-10"
+                priority
+              />
               {/* Animated black orb circling around the picture */}
               <div
                 ref={orbRef}
@@ -71,14 +79,6 @@ const Hero: React.FC = () => {
                   top: `0px`,
                 }}
                 aria-hidden="true"
-              />
-              <Image
-                src="/WebPicture.png"
-                alt="Web Picture"
-                width={AVATAR_SIZE}
-                height={AVATAR_SIZE}
-                className="rounded-full object-cover object-center shadow-xl z-10"
-                priority
               />
             </div>
             <div className="relative mb-2 text-center">
