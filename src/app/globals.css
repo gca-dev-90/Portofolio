@@ -205,17 +205,3 @@ svg .wave-3 { animation: waveDrift 44s ease-in-out infinite; }
 @media (max-width: 768px) {
   .tilt-left, .tilt-right { transform: none; }
 }
-
-/* Responsive hero icon sizing for mobile only (portrait & landscape) */
-@media (max-width: 1200px) and (orientation: portrait) {
-  .hero-icon {
-    width: 40px !important;
-    height: 40px !important;
-  }
-}
-@media (max-width: 1200px) and (orientation: landscape) {
-  .hero-icon {
-    width: 56px !important;
-    height: 56px !important;
-  }
-}
